@@ -56,6 +56,7 @@ class Ui_RadialBand(object):
         self.label_3.setWordWrap(True)
         self.label_3.setObjectName(_fromUtf8("label_3"))
 
+
         self.retranslateUi(RadialBand)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), RadialBand.reject)
         QtCore.QObject.connect(self.AddBand, QtCore.SIGNAL(_fromUtf8("clicked()")), RadialBand.AddData)
