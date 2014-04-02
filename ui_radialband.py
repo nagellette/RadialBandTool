@@ -62,7 +62,7 @@ class Ui_RadialBand(object):
         QtCore.QObject.connect(self.AddBand, QtCore.SIGNAL(_fromUtf8("clicked()")), RadialBand.AddData)
         QtCore.QObject.connect(self.DeleteBand, QtCore.SIGNAL(_fromUtf8("clicked()")), RadialBand.DeleteData)
         QtCore.QObject.connect(self.ClearBand, QtCore.SIGNAL(_fromUtf8("clicked()")), RadialBand.ClearBands)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), RadialBand.CalculateRings)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), RadialBand.accept)
         QtCore.QMetaObject.connectSlotsByName(RadialBand)
 
     def AddData(self):

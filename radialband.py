@@ -23,6 +23,8 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
+from qgis.gui import *
+from qgis import *
 # Initialize Qt resources from file resources.py
 import resources_rc
 # Import the code for the dialog
@@ -48,7 +50,7 @@ class RadialBand:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        # Create the dialog (after translation) and keep reference
+
         self.dlg = RadialBandDialog()
 
     def initGui(self):
@@ -68,14 +70,49 @@ class RadialBand:
         self.iface.removePluginMenu(u"&RadialBandsTool", self.action)
         self.iface.removeToolBarIcon(self.action)
 
+    def inputConfig(self):
+        QgisMainWindow = qgis.utils.iface.mainWindow()
+        filename = QFileDialog.getSaveFileName(QgisMainWindow, "Save File", os.getenv('HOME'))
+        fname = open(filename, w)
+        data = fname.write()
+        self.textEdit.setText(data)
+        fname.close()
+
+    def get_selected_coordinates(self):
+
+        #need to grap coordinates from geometry to string
+        layer = utils.iface.activeLayer()
+        selected_features = layer.selectedFeatures()
+        #geom=[]
+        for f in selected_features:
+            #geom.append(f.geometry())
+            asd=f.geometry().asPoint
+            print str(asd)
+                
+
+    def get_radius(self):
+        none
+        
+    def draw_circle_to_selected_coordinates(self, band_values):
+        none
+    
+
     # run method that performs all the real work
     def run(self):
-        # show the dialog
+        self.dlg=RadialBandDialog()
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
         if result == 1:
-            # do something useful (delete the line containing pass and
-            # substitute with your code)
+            self.get_selected_coordinates()
+            RadialLayer=QgsVectorLayer(self.plugin_dir+"/shp/RadialBand.shp", "RadialBand", "ogr")
+            if not RadialLayer.isValid():
+                print ("Layer failed to load!")
+                print (self.plugin_dir+"/RadialBandTool/shp/RadialBand.shp""Layer failed to load!")
+            else:
+                QgsMapLayerRegistry.instance().addMapLayer(RadialLayer)# show the dialog
+
+            #self.inputConfig()
+                        
             pass
