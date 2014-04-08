@@ -27,6 +27,7 @@ from qgis.gui import *
 from qgis import *
 # Initialize Qt resources from file resources.py
 import resources_rc
+from ui_radialband import Ui_RadialBand
 # Import the code for the dialog
 from radialbanddialog import RadialBandDialog
 import os.path
@@ -71,30 +72,51 @@ class RadialBand:
         self.iface.removeToolBarIcon(self.action)
 
     def inputConfig(self):
-        QgisMainWindow = qgis.utils.iface.mainWindow()
+        QgisMainWindow = utils.iface.mainWindow()
         filename = QFileDialog.getSaveFileName(QgisMainWindow, "Save File", os.getenv('HOME'))
         fname = open(filename, w)
         data = fname.write()
         self.textEdit.setText(data)
         fname.close()
 
-    def get_selected_coordinates(self):
-
-        #need to grap coordinates from geometry to string
-        layer = utils.iface.activeLayer()
-        selected_features = layer.selectedFeatures()
-        #geom=[]
-        for f in selected_features:
-            #geom.append(f.geometry())
-            asd=f.geometry().asPoint
-            print str(asd)
-                
-
-    def get_radius(self):
-        none
         
-    def draw_circle_to_selected_coordinates(self, band_values):
-        none
+    def draw_circle_to_selected_coordinates(self):
+        """
+        Gets the coordinate of selected features and draws the circles for desired radius in qgis
+        """
+
+        #add active layer
+        layer = utils.iface.activeLayer()
+        
+        #gets selected features from active layer
+        selected_features = layer.selectedFeatures()
+        
+        #creates new memory layer for radial bands
+        vpoly = QgsVectorLayer("Polygon", "RadialBand", "memory")
+        feature = QgsFeature()
+        provider = vpoly.dataProvider()
+        vpoly.startEditing()
+        
+        #filling radial band table with selected feature coordinates
+        for f in selected_features:
+            geom = f.geometry()
+            #print geom.asPoint()
+            #return geom.asPoint()
+            #for index in Ui_radialband.listWidget.count():
+            #    radius = Ui_radialband.listWidget(index)
+            #print geom.asPoint().x(), geom.asPoint().y()
+            x=float(geom.asPoint().x())
+            y=float(geom.asPoint().y())
+            #drawin band per feature and radius (radius will be modified
+            radius=50
+            feature.setGeometry( QgsGeometry.fromPoint(QgsPoint(x,y)).buffer(radius,100))
+            #feature.setAttributeMap(f.attributeMap())
+            provider.addFeatures( [feature] )
+
+        vpoly.commitChanges()         
+
+        QgsMapLayerRegistry.instance().addMapLayer(vpoly)
+        
     
 
     # run method that performs all the real work
@@ -105,13 +127,7 @@ class RadialBand:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result == 1:
-            self.get_selected_coordinates()
-            RadialLayer=QgsVectorLayer(self.plugin_dir+"/shp/RadialBand.shp", "RadialBand", "ogr")
-            if not RadialLayer.isValid():
-                print ("Layer failed to load!")
-                print (self.plugin_dir+"/RadialBandTool/shp/RadialBand.shp""Layer failed to load!")
-            else:
-                QgsMapLayerRegistry.instance().addMapLayer(RadialLayer)# show the dialog
+            self.draw_circle_to_selected_coordinates()
 
             #self.inputConfig()
                         
