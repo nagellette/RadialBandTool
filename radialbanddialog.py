@@ -34,3 +34,4 @@ class RadialBandDialog(QtGui.QDialog, Ui_RadialBand):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+

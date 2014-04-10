@@ -27,9 +27,9 @@ from qgis.gui import *
 from qgis import *
 # Initialize Qt resources from file resources.py
 import resources_rc
-from ui_radialband import Ui_RadialBand
 # Import the code for the dialog
 from radialbanddialog import RadialBandDialog
+from ui_radialband import Ui_RadialBand
 import os.path
 
 
@@ -71,24 +71,14 @@ class RadialBand:
         self.iface.removePluginMenu(u"&RadialBandsTool", self.action)
         self.iface.removeToolBarIcon(self.action)
 
-    def inputConfig(self):
-        QgisMainWindow = utils.iface.mainWindow()
-        filename = QFileDialog.getSaveFileName(QgisMainWindow, "Save File", os.getenv('HOME'))
-        fname = open(filename, w)
-        data = fname.write()
-        self.textEdit.setText(data)
-        fname.close()
-
         
     def draw_circle_to_selected_coordinates(self):
         """
         Gets the coordinate of selected features and draws the circles for desired radius in qgis
         """
 
-        #add active layer
+        #set active layer as layer
         layer = utils.iface.activeLayer()
-        
-        #gets selected features from active layer
         selected_features = layer.selectedFeatures()
         
         #creates new memory layer for radial bands
@@ -96,22 +86,29 @@ class RadialBand:
         feature = QgsFeature()
         provider = vpoly.dataProvider()
         vpoly.startEditing()
+	
+	#get band radiuses from the file
+        list=[]
+        f=open("radial_band.nodelete", "r")
+        with open('radial_band.nodelete') as openfileobject:
+            for line in openfileobject:
+                value=float(line.strip())
+                list.append(value)
+        f.close()
         
-        #filling radial band table with selected feature coordinates
+        #filling radial band table with selected feature coordinates and desired radiuses
         for f in selected_features:
             geom = f.geometry()
-            #print geom.asPoint()
-            #return geom.asPoint()
-            #for index in Ui_radialband.listWidget.count():
-            #    radius = Ui_radialband.listWidget(index)
-            #print geom.asPoint().x(), geom.asPoint().y()
             x=float(geom.asPoint().x())
             y=float(geom.asPoint().y())
-            #drawin band per feature and radius (radius will be modified
-            radius=50
-            feature.setGeometry( QgsGeometry.fromPoint(QgsPoint(x,y)).buffer(radius,100))
-            #feature.setAttributeMap(f.attributeMap())
-            provider.addFeatures( [feature] )
+            item=0
+            for item in range(0, len(list)):
+                radius=list[item]
+		#draw circle to the selected coordinates and radius one by one
+                feature.setGeometry( QgsGeometry.fromPoint(QgsPoint(x,y)).buffer(radius,100))
+                provider.addFeatures( [feature] )
+                item+=item
+
 
         vpoly.commitChanges()         
 
@@ -128,7 +125,4 @@ class RadialBand:
         # See if OK was pressed
         if result == 1:
             self.draw_circle_to_selected_coordinates()
-
-            #self.inputConfig()
-                        
             pass
