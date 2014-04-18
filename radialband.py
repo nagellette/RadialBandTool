@@ -80,13 +80,30 @@ class RadialBand:
         #set active layer as layer
         layer = utils.iface.activeLayer()
         selected_features = layer.selectedFeatures()
+
+        #for f in selected_features:
+        #    print f.attributeMap()
+
+
+        #creating layer structure using selected layer fields.
+        fields = layer.pendingFields()
+        fields_in="Polygon?"
+        field_counter=1
         
-        #creates new memory layer for radial bands
-        vpoly = QgsVectorLayer("Polygon", "RadialBand", "memory")
+        for field in fields:
+            fields_in=fields_in+'field='+str(field.name())+ ':'+str(field.typeName())+'&'
+            field_counter+=field_counter
+            
+        
+        fields_in= fields_in+('field=Band:Double')
+
+               
+        #creates new memory layer for radial bands with selected layer attributes
+        vpoly = QgsVectorLayer(fields_in, "RadialBand", "memory")
         feature = QgsFeature()
         provider = vpoly.dataProvider()
         vpoly.startEditing()
-	
+
 	#get band radiuses from the file
         list=[]
         f=open("radial_band.nodelete", "r")
@@ -99,19 +116,23 @@ class RadialBand:
         #filling radial band table with selected feature coordinates and desired radiuses
         for f in selected_features:
             geom = f.geometry()
+            attr_in=f.attributes()
             x=float(geom.asPoint().x())
             y=float(geom.asPoint().y())
             item=0
             for item in range(0, len(list)):
                 radius=list[item]
+                attr=attr_in
 		#draw circle to the selected coordinates and radius one by one
                 feature.setGeometry( QgsGeometry.fromPoint(QgsPoint(x,y)).buffer(radius,100))
+                attr.append(radius)
+                feature.setAttributes(attr)
                 provider.addFeatures( [feature] )
+                del attr[-1]
                 item+=item
 
 
-        vpoly.commitChanges()         
-
+        vpoly.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vpoly)
         
     

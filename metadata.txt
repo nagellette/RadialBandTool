@@ -27,7 +27,7 @@ email=necipenesgengec@gmail.com
 tags=radial band, radial catchment
 
 homepage=https://github.com/nagellette/RadialBandTool
-tracker=
+tracker=https://github.com/nagellette/RadialBandTool/issues
 repository=https://github.com/nagellette/RadialBandTool
 icon=icon.png
 # experimental flag
