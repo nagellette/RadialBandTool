@@ -64,11 +64,13 @@ class RadialBand:
 
         # Add toolbar button and menu item
         self.iface.addToolBarIcon(self.action)
-        self.iface.addPluginToMenu(u"&RadialBandsTool", self.action)
+        #self.iface.addPluginToMenu(u"&RadialBandsTool", self.action)
+        self.iface.vectorMenu().addAction(self.action)
 
     def unload(self):
         # Remove the plugin menu item and icon
         self.iface.removePluginMenu(u"&RadialBandsTool", self.action)
+        self.iface.vectorMenu().removeAction(self.action)
         self.iface.removeToolBarIcon(self.action)
 
         
