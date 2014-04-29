@@ -136,6 +136,11 @@ class RadialBand:
 
         vpoly.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vpoly)
+        symbols = vpoly.rendererV2().symbols()
+        symbol = symbols[0]
+        symbol.setColor(QColor(0,0,0,0))
+        utils.iface.mapCanvas().refresh() 
+        utils.iface.legendInterface().refreshLayerSymbology(vpoly)
         
     
 
