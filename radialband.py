@@ -106,15 +106,6 @@ class RadialBand:
         provider = vpoly.dataProvider()
         vpoly.startEditing()
 
-	#get band radiuses from the file
-        list=[]
-        f=open("radial_band.nodelete", "r")
-        with open('radial_band.nodelete') as openfileobject:
-            for line in openfileobject:
-                value=float(line.strip())
-                list.append(value)
-        f.close()
-        
         #filling radial band table with selected feature coordinates and desired radiuses
         for f in selected_features:
             geom = f.geometry()
@@ -122,8 +113,8 @@ class RadialBand:
             x=float(geom.asPoint().x())
             y=float(geom.asPoint().y())
             item=0
-            for item in range(0, len(list)):
-                radius=list[item]
+            for item in range(0, len(Ui_RadialBand.list_bands)):
+                radius=Ui_RadialBand.list_bands[item]
                 attr=attr_in
 		#draw circle to the selected coordinates and radius one by one
                 feature.setGeometry( QgsGeometry.fromPoint(QgsPoint(x,y)).buffer(radius,100))

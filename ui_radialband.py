@@ -16,6 +16,9 @@ except AttributeError:
     _fromUtf8 = lambda s: s
 
 class Ui_RadialBand(object):
+    list_bands = []
+
+
     def setupUi(self, RadialBand):
         RadialBand.setObjectName(_fromUtf8("RadialBand"))
         RadialBand.resize(374, 325)
@@ -58,16 +61,21 @@ class Ui_RadialBand(object):
         self.label_3.setObjectName(_fromUtf8("label_3"))
 
 
+
         self.retranslateUi(RadialBand)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), RadialBand.reject)
         QtCore.QObject.connect(self.AddBand, QtCore.SIGNAL(_fromUtf8("clicked()")), RadialBand.AddData)
         QtCore.QObject.connect(self.DeleteBand, QtCore.SIGNAL(_fromUtf8("clicked()")), RadialBand.DeleteData)
         QtCore.QObject.connect(self.ClearBand, QtCore.SIGNAL(_fromUtf8("clicked()")), RadialBand.ClearBands)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), RadialBand.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), RadialBand.write_radius)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), RadialBand.pass_radius)
         QtCore.QMetaObject.connectSlotsByName(RadialBand)
 
         list_values=pyqtSignal()
+
+        #for band in range(self.listWidget.count()):
+        #    list_bands.append(self.listWidget.item(band).text())
+
         
 
     def AddData(self):
@@ -114,17 +122,9 @@ class Ui_RadialBand(object):
     def ClearBands(self):
         self.listWidget.clear()
 
-    def write_radius(self):
-        #Open new data file for user entered radiuses
-        f = open("radial_band.nodelete", "w")
-        f.truncate()
-        
-        for bands in range(self.listWidget.count()):
-            radius=self.listWidget.item(bands).text()
-            f.write( str(radius)  )
-            f.write('\n')
-            
-        f.close()
+    def pass_radius(self):
+        for band in range(self.listWidget.count()):
+            Ui_RadialBand.list_bands.append(float(self.listWidget.item(band).text()))
         
 
     def retranslateUi(self, RadialBand):
