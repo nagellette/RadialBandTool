@@ -34,7 +34,6 @@ import os.path
 
 
 class RadialBand:
-
     def __init__(self, iface):
         # Save reference to the QGIS interface
         self.iface = iface
@@ -50,7 +49,6 @@ class RadialBand:
 
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
-
 
         self.dlg = RadialBandDialog()
 
@@ -73,7 +71,7 @@ class RadialBand:
         self.iface.vectorMenu().removeAction(self.action)
         self.iface.removeToolBarIcon(self.action)
 
-        
+
     def draw_circle_to_selected_coordinates(self):
         """
         Gets the coordinate of selected features and draws the circles for desired radius in qgis
@@ -89,17 +87,16 @@ class RadialBand:
 
         #creating layer structure using selected layer fields.
         fields = layer.pendingFields()
-        fields_in="Polygon?"
-        field_counter=1
-        
-        for field in fields:
-            fields_in=fields_in+'field='+str(field.name())+ ':'+str(field.typeName())+'&'
-            field_counter+=field_counter
-            
-        
-        fields_in= fields_in+('field=Band:Double')
+        fields_in = "Polygon?"
+        field_counter = 1
 
-               
+        for field in fields:
+            fields_in = fields_in + 'field=' + str(field.name()) + ':' + str(field.typeName()) + '&'
+            field_counter += field_counter
+
+        fields_in = fields_in + ('field=Band:Double')
+
+
         #creates new memory layer for radial bands with selected layer attributes
         vpoly = QgsVectorLayer(fields_in, "RadialBand", "memory")
         feature = QgsFeature()
@@ -109,35 +106,41 @@ class RadialBand:
         #filling radial band table with selected feature coordinates and desired radiuses
         for f in selected_features:
             geom = f.geometry()
-            attr_in=f.attributes()
-            x=float(geom.asPoint().x())
-            y=float(geom.asPoint().y())
-            item=0
+            attr_in = f.attributes()
+            x = float(geom.asPoint().x())
+            y = float(geom.asPoint().y())
+            item = 0
             for item in range(0, len(Ui_RadialBand.list_bands)):
-                radius=Ui_RadialBand.list_bands[item]
-                attr=attr_in
-		#draw circle to the selected coordinates and radius one by one
-                feature.setGeometry( QgsGeometry.fromPoint(QgsPoint(x,y)).buffer(radius,100))
+                radius = Ui_RadialBand.list_bands[item]
+                attr = attr_in
+                #draw circle to the selected coordinates and radius one by one
+                feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(x, y)).buffer(radius, 100))
                 attr.append(radius)
                 feature.setAttributes(attr)
-                provider.addFeatures( [feature] )
+                provider.addFeatures([feature])
+                print radius, attr
                 del attr[-1]
-                item+=item
+                item += item
 
+
+        #print attr
+        #print Ui_RadialBand.list_bands
+        # free lists for re-use
+        attr = []
+        Ui_RadialBand.list_bands = []
 
         vpoly.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vpoly)
         symbols = vpoly.rendererV2().symbols()
         symbol = symbols[0]
-        symbol.setColor(QColor(0,0,0,0))
-        utils.iface.mapCanvas().refresh() 
+        symbol.setColor(QColor(0, 0, 0, 0))
+        utils.iface.mapCanvas().refresh()
         utils.iface.legendInterface().refreshLayerSymbology(vpoly)
-        
-    
+
 
     # run method that performs all the real work
     def run(self):
-        self.dlg=RadialBandDialog()
+        self.dlg = RadialBandDialog()
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
