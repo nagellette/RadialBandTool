@@ -56,7 +56,7 @@ class RadialBand:
         # Create action that will start plugin configuration
         self.action = QAction(
             QIcon(":/plugins/radialband/icon.png"),
-            u"Radilal Band Tool", self.iface.mainWindow())
+            u"Radial Band Tool", self.iface.mainWindow())
         # connect the action to the run method
         self.action.triggered.connect(self.run)
 
